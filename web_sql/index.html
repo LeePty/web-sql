@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Web Sql Database API</title>
+</head>
+<body>
+<h1>Web SQL Database</h1>
+<table id="racers" border="1" cellspacing="0" style="width:100%;">
+    <thead>
+        <th>Id</th>
+        <th>Name</th>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<script>
+    // 前端 后端 数据库
+    // 链接数据库 在浏览器内 内置的sqlite小型数据库 5M左右的小数据
+    // 离线吗首页的新闻列表， 从后端取完后，存于前端数据库
+    // 从列表页点进详情页，存储详情页的信息
+    // 如果没有，打开就会创建，
+    var db = window.openDatabase('db', '1.0', 'my first database', 2*1024*1024);
+    function initDatabase() {
+        var names = ['Peter', 'Albers', 'Salim']
+        // db 数据库的句柄
+        db.transaction(function(tx) {
+            // sql语句
+            // CREATE TABLE 创建表格
+            // IF NOT EXSITS 不存在则创建
+            // 字段 字段名 类型 主键
+            // tx.executeSql('CREATE TABLE IF NOT EXISTS racers (id integer primary key autoincrement, name)');
+            // for(name of names) {
+            //     // INSERT INTO 表名（字段列表）VALUES (?,?....)
+            //     tx.executeSql('INSERT INTO racers (name) VALUES (?)', [name])   
+            // }
+            doQuery();
+        });
+    function doQuery () {
+        db.transaction(function (tx) {
+            tx.executeSql('SELECT * from  racers', [], function(tx, result) {
+                for(var i = 0; i < result.rows.length; i++) {
+                    // 数据库有行跟列的概念， 行就是一行数据， 列就是字段 result.rows 结果的集合
+                    // rows.item(i)
+                    var item = result.rows.item(i);
+                    log(item.id, item.name);
+                }
+            })
+        })
+    };
+    function log(id, name) {
+        var row = document.createElement('tr');
+        var idCell = document.createElement('td');
+        var nameCell = document.createElement('td');
+        idCell.textContent = id;
+        nameCell.textContent = name;
+        row.appendChild(idCell);
+        row.appendChild(nameCell);
+        document.getElementById('racers').appendChild(row);
+        }   
+    }
+    
+    initDatabase();
+</script>
+</body>
+</html>
